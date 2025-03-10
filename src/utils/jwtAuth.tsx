@@ -1,0 +1,1 @@
+export const jwtAuth = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqb2huZG9lQGNvbXBhbnkuY29tIiwiaWF0IjoxNzQxMzI2Mjc1LCJleHAiOjE3NDIxOTAyNzV9.lW18dedqcfEbI9vD0JljGiwgoTB0PlGuSzKjUGgUtpsMascRkUIEHz7TYaWnNALO-TMgpPkJnCeQswy5zgUQ2Q"
