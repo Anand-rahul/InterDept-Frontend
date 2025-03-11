@@ -227,7 +227,7 @@ export default function SolutionDetailsPage() {
       </div>
 
       {/* Chat Bubble Component */}
-      <ChatBubble faqs={faqs} />
+      <ChatBubble faqs={faqs} solutionId={id} />
 
       {/* Sticky Submit Requirement Button */}
       <Link

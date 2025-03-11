@@ -5,6 +5,8 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { MessageCircle, X, Send, HelpCircle } from "lucide-react"
 import { FAQ, FAQItem } from "./faqItem"
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface Message {
   id: string
@@ -16,10 +18,16 @@ interface Message {
 interface ChatBubbleProps {
   title?: string
   faqs?: FAQ[]
+  solutionId: string
+}
+
+interface ChatResponse {
+  response: string
+  guid?: string
 }
 
 const title = "Chat to know more"
-export function ChatBubble({faqs = [] }: ChatBubbleProps) {
+export function ChatBubble({ title = "Chat to know more", faqs = [], solutionId }: ChatBubbleProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<"chat" | "faq">(faqs.length > 0 ? "faq" : "chat")
   const [messages, setMessages] = useState<Message[]>([
@@ -31,8 +39,11 @@ export function ChatBubble({faqs = [] }: ChatBubbleProps) {
     },
   ])
   const [inputValue, setInputValue] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [conversationGuid, setConversationGuid] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
 
   const hasFaqs = faqs.length > 0
 
@@ -40,8 +51,8 @@ export function ChatBubble({faqs = [] }: ChatBubbleProps) {
     setIsOpen(!isOpen)
   }
 
-  const handleSendMessage = () => {
-    if (!inputValue.trim()) return
+  const handleSendMessage = async () => {
+    if (!inputValue.trim() || isLoading) return
 
     // Add user message
     const userMessage: Message = {
@@ -53,17 +64,63 @@ export function ChatBubble({faqs = [] }: ChatBubbleProps) {
 
     setMessages((prev) => [...prev, userMessage])
     setInputValue("")
+    setIsLoading(true)
 
-    // Simulate bot response after a short delay
-    setTimeout(() => {
+    try {
+      // Build URL with query parameters instead of using request body
+      let url = `/api/solutions/${solutionId}/chat?query=${encodeURIComponent(userMessage.text)}`;
+
+      // Add guid parameter if available
+      if (conversationGuid) {
+        url += `&guid=${encodeURIComponent(conversationGuid)}`;
+      }
+
+      // Send message to API with params in URL
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // Empty body since we're using URL parameters
+        body: JSON.stringify({}),
+      });
+
+      console.log(response)
+      if (!response.ok) {
+        throw new Error('Failed to get response from server');
+      }
+
+      const data: ChatResponse = await response.json();
+
+      // Save conversation GUID for future messages
+      if (data.guid) {
+        setConversationGuid(data.guid);
+      }
+
+      // Add bot response
       const botMessage: Message = {
         id: `bot-${Date.now()}`,
-        text: "Thanks for your message. Our team will review your question and get back to you soon.",
+        text: data.response || "Sorry, I couldn't process your request at this time.",
         sender: "bot",
         timestamp: new Date(),
       }
+
       setMessages((prev) => [...prev, botMessage])
-    }, 1000)
+    } catch (error) {
+      console.error('Error sending message:', error);
+
+      // Add error message
+      const errorMessage: Message = {
+        id: `bot-error-${Date.now()}`,
+        text: "Sorry, there was an error processing your request. Please try again later.",
+        sender: "bot",
+        timestamp: new Date(),
+      }
+
+      setMessages((prev) => [...prev, errorMessage])
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -92,9 +149,8 @@ export function ChatBubble({faqs = [] }: ChatBubbleProps) {
       {/* Chat Toggle Button */}
       <button
         onClick={toggleChat}
-        className={`fixed bottom-5 right-5 p-4 rounded-full shadow-lg z-50 transition-colors duration-300 ${
-          isOpen ? "bg-red-500 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-700"
-        } text-white`}
+        className={`fixed bottom-5 right-5 p-4 rounded-full shadow-lg z-50 transition-colors duration-300 ${isOpen ? "bg-red-500 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-700"
+          } text-white`}
         aria-label={isOpen ? "Close chat" : "Open chat"}
       >
         {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
@@ -102,7 +158,7 @@ export function ChatBubble({faqs = [] }: ChatBubbleProps) {
 
       {/* Chat Popup */}
       {isOpen && (
-        <div className="fixed bottom-20 right-5 w-80 sm:w-96 bg-white rounded-lg shadow-xl z-40 flex flex-col overflow-hidden transition-all duration-300 ease-in-out max-h-[70vh]">
+        <div className="fixed bottom-20 right-5 w-80 sm:w-180 bg-white rounded-lg shadow-xl z-40 flex flex-col overflow-hidden transition-all duration-300 ease-in-out max-h-[70vh]">
           {/* Header */}
           <div className="bg-blue-600 text-white p-3 flex justify-between items-center">
             <h3 className="font-semibold">{title}</h3>
@@ -115,19 +171,17 @@ export function ChatBubble({faqs = [] }: ChatBubbleProps) {
           {hasFaqs && (
             <div className="flex border-b">
               <button
-                className={`flex-1 py-2 px-4 text-sm font-medium ${
-                  activeTab === "chat"
+                className={`flex-1 py-2 px-4 text-sm font-medium ${activeTab === "chat"
                     ? "border-b-2 border-blue-500 text-blue-600"
                     : "text-gray-600 hover:text-blue-500"
-                }`}
+                  }`}
                 onClick={() => setActiveTab("chat")}
               >
                 <MessageCircle size={16} className="inline mr-1" /> Chat
               </button>
               <button
-                className={`flex-1 py-2 px-4 text-sm font-medium ${
-                  activeTab === "faq" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-600 hover:text-blue-500"
-                }`}
+                className={`flex-1 py-2 px-4 text-sm font-medium ${activeTab === "faq" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-600 hover:text-blue-500"
+                  }`}
                 onClick={() => setActiveTab("faq")}
               >
                 <HelpCircle size={16} className="inline mr-1" /> FAQs
@@ -146,13 +200,17 @@ export function ChatBubble({faqs = [] }: ChatBubbleProps) {
                     className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[80%] rounded-lg px-3 py-2 ${
-                        message.sender === "user"
+                      className={`max-w-[80%] rounded-lg px-3 py-2 ${message.sender === "user"
                           ? "bg-blue-500 text-white"
                           : "bg-white text-gray-800 border border-gray-200"
-                      }`}
+                        }`}
                     >
-                      <p className="text-sm">{message.text}</p>
+                     
+                      <div className="text-sm markdown-content">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {message.text}
+                        </ReactMarkdown>
+                      </div>
                       <p className="text-xs opacity-70 mt-1">
                         {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       </p>
@@ -165,7 +223,7 @@ export function ChatBubble({faqs = [] }: ChatBubbleProps) {
               // FAQ Section
               <div className="space-y-2">
                 {faqs.map((faq, index) => (
-                  <FAQItem key={index} id ={faq.id} question={faq.question} answer={faq.answer} />
+                  <FAQItem key={index} id={faq.id} question={faq.question} answer={faq.answer} />
                 ))}
               </div>
             )}
@@ -183,13 +241,18 @@ export function ChatBubble({faqs = [] }: ChatBubbleProps) {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}
+                  disabled={isLoading}
                 />
                 <button
                   onClick={handleSendMessage}
-                  disabled={!inputValue.trim()}
-                  className="bg-blue-500 text-white rounded-r-md px-3 py-2 hover:bg-blue-600 disabled:bg-blue-300"
+                  disabled={!inputValue.trim() || isLoading}
+                  className="bg-blue-500 text-white rounded-r-md px-3 py-2 hover:bg-blue-600 disabled:bg-blue-300 flex items-center justify-center"
                 >
-                  <Send size={18} />
+                  {isLoading ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <Send size={18} />
+                  )}
                 </button>
               </div>
             </div>
@@ -199,4 +262,3 @@ export function ChatBubble({faqs = [] }: ChatBubbleProps) {
     </>
   )
 }
-
