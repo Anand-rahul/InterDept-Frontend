@@ -1,17 +1,50 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
+import { getUserData } from "@/components/userData";
+import { UserMenu } from "./userMenu";import 
+{ usePathname, useRouter } from "next/navigation"
+import { User, LogOut, ChevronDown, Settings, FileText, PlusCircle, ListChecks } from "lucide-react"
+
 
 const navItems = [
+  { name: "Home", href: "/" },
   { name: "Solutions", href: "/solutions" },
-  { name: "SolveIT", href: "/solveIT" },
-  { name: "OptiMax", href: "/optimax" },
+  { name: "SolveIT", href: "/solveIt" },
   { name: "ImpactLens", href: "/impactlens" },
-]
+  { name: "OptiMax", href: "/optimax" },
+];
 
 export function Header() {
-  const pathname = usePathname()
+  const pathname = usePathname();
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  const userData = getUserData();
+  // Close the menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
+        setIsUserMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    // In a real app, this would handle the logout process
+    console.log("Logging out...");
+    setIsUserMenuOpen(false);
+    // You would typically redirect to login page or clear auth state here
+  };
 
   return (
     <header className="w-full">
@@ -19,25 +52,30 @@ export function Header() {
         <Link href="/" className="text-2xl font-bold text-blue-500">
           BITS HUB
         </Link>
-        <nav className="flex items-center space-x-4">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`px-3 py-2 ${
-                  isActive ? "border-2 border-blue-500 rounded" : "text-gray-700 hover:text-blue-500"
-                }`}
-              >
-                {item.name}
-              </Link>
-            )
-          })}
-        </nav>
+        <div className="flex items-center">
+          {/* Navigation */}
+          <nav className="flex items-center space-x-1 mr-4">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`px-3 py-2 ${
+                    isActive
+                      ? "border-2 border-blue-500 rounded"
+                      : "text-gray-700 hover:text-blue-500"
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              );
+            })}
+          </nav>
+          <UserMenu {...userData} handleLogout={handleLogout} />
+        </div>
       </div>
       <div className="h-1 w-full bg-blue-500" />
     </header>
-  )
+  );
 }
-

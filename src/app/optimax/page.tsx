@@ -72,7 +72,7 @@ export default function OptiMaxPage() {
       {/* Header Section */}
       <div className="gradient-header py-6 px-4 text-center rounded-b-lg shadow-md">
         <h1 className="text-2xl font-semibold mb-1">
-          OptiMax - Optimize & Eliminate Inefficiencies
+          OptiMax - Analyze & Optimize Solutions
         </h1>
       </div>
 

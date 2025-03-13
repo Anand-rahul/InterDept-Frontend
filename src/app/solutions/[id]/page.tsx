@@ -4,9 +4,16 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ChatBubble } from "@/components/chatBubble";
-import { FAQ } from "@/components/faqItem";
-import { SolutionDetails } from "@/models/solution";
-import { Download, Eye, ThumbsUp } from "lucide-react";
+import { FAQ, SolutionDetails, statusColors } from "@/models/solution";
+import {
+  Download,
+  Eye,
+  FileDown,
+  FileText,
+  ThumbsUp,
+  User,
+  Users,
+} from "lucide-react";
 import { LoadingSpinner } from "@/components/loadingSpinner";
 import AutoDownloadLink from "@/components/autoDownloadLink";
 
@@ -143,27 +150,40 @@ export default function SolutionDetailsPage() {
       <div className="container mx-auto px-4 mt-4">
         {/* Stats Card */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 mb-6">
-          <div className="flex flex-wrap gap-4 text-sm">
-            <button
-              onClick={handleLikeClick}
-              className="flex items-center text-gray-600 hover:text-blue-600 transition-colors duration-200 focus:outline-none"
-              aria-label={isLiked ? "Unlike" : "Like"}
-            >
-              <ThumbsUp
-                size={16}
-                className={`mr-1 ${
-                  isLiked ? "fill-blue-600 text-blue-600" : "text-blue-600"
-                }`}
-              />
-              <span>{likeCount} Likes</span>
-            </button>
-            <div className="flex items-center text-gray-600">
-              <Eye size={16} className="mr-1 text-blue-600" />
-              <span>{solution.viewCount} Views</span>
+          <div className="flex flex-col md:flex-row md:justify-between gap-3">
+            {/* Left-aligned PMO and Delivery Manager */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center text-gray-600">
+                <User size={16} className="mr-1 text-blue-600" />
+                <span>PMO: {solution.pmo}</span>
+              </div>
+              <div className="flex items-center text-gray-600">
+                <Users size={16} className="mr-1 text-blue-600" />
+                <span>Delivery Manager: {solution.deliveryManager}</span>
+              </div>
             </div>
-            <div className="flex items-center text-gray-600">
-              <Download size={16} className="mr-1 text-blue-600" />
-              <span>{10} Adoptions</span>
+
+            {/* Right-aligned metrics */}
+            <div className="flex flex-wrap gap-4 text-sm items-center">
+              <div className="flex items-center text-gray-600">
+                <ThumbsUp size={16} className="mr-1 text-blue-600" />
+                <span>{solution.likeCount} Likes</span>
+              </div>
+              <div className="flex items-center text-gray-600">
+                <Eye size={16} className="mr-1 text-blue-600" />
+                <span>{solution.viewCount} Views</span>
+              </div>
+              <div className="flex items-center text-gray-600">
+                <Download size={16} className="mr-1 text-blue-600" />
+                <span>{solution.useCases.length} Adoptions</span>
+              </div>
+              <span
+                className={`px-3 py-1 rounded-full font-medium ${
+                  statusColors[solution.status]
+                }`}
+              >
+                {solution.status}
+              </span>
             </div>
           </div>
         </div>
@@ -189,7 +209,7 @@ export default function SolutionDetailsPage() {
           <h2 className="text-xl font-bold text-blue-700 mb-3">
             Supporting Documents
           </h2>
-          <ul className="list-disc pl-5">
+          <ul className="space-y-2">
             {isDocumentsLoading ? (
               <LoadingSpinner size="small" />
             ) : documents.length === 0 ? (
@@ -198,10 +218,11 @@ export default function SolutionDetailsPage() {
               </p>
             ) : (
               Object.entries(documents).map(([fileName, value], index) => (
-                <li key={index} className="mb-2">
+                <li key={index} className="flex items-center">
+                  <FileText className="h-5  w-5 text-blue-500 mr-2" />
                   <AutoDownloadLink
                     fileId={value}
-                    className="text-blue-500 hover:underline"
+                    className="text-blue-600 hover:underline"
                   >
                     {fileName}
                   </AutoDownloadLink>
@@ -209,6 +230,43 @@ export default function SolutionDetailsPage() {
               ))
             )}
           </ul>
+        </div>
+
+        {/* Use Cases Section */}
+        <div className="bg-white rounded-lg p-5 shadow-md mt-4">
+          <h2 className="text-xl font-bold text-blue-700 mb-3">Use Cases</h2>
+          <div className="p-1">
+            {solution.useCases && solution.useCases.length > 0 ? (
+              <div className="space-y-4">
+                {solution.useCases.map((useCase, index) => (
+                  <div
+                    key={index}
+                    className="border border-gray-100 rounded-md p-3"
+                  >
+                    <div className="flex justify-between items-start">
+                      <h3 className="text-sm font-semibold ">
+                        {useCase.title}
+                      </h3>
+                      <AutoDownloadLink
+                        fileId={useCase.fileId}
+                        className="text-blue-600 hover:text-blue-800 text-xs flex items-center"
+                      >
+                        <FileDown size={14} className="mr-1" />
+                        UD Document
+                      </AutoDownloadLink>
+                    </div>
+                    <p className="text-xs text-gray-600 mt-1">
+                      {useCase.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 italic">
+                No use cases available for this solution.
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Similar Solutions */}
@@ -232,7 +290,7 @@ export default function SolutionDetailsPage() {
       {/* Sticky Submit Requirement Button */}
       <Link
         href={{
-          pathname: "/solveIT/submit",
+          pathname: "/solveIt/submit",
           query: {
             solutionId: solution.id,
             solutionTitle: solution.title,

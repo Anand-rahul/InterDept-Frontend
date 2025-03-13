@@ -10,24 +10,24 @@ export function RequirementCard({ requirement }: {requirement: RequirementDispla
       <td className="px-4 py-3">
         <span
           className={`px-2 py-1 text-xs font-semibold rounded ${
-           requirement.priority === "High"
+           requirement.priority?.toUpperCase() === "HIGH"
               ? "bg-red-100 text-red-800"
-              : requirement.priority === "Medium"
+              : requirement.priority?.toUpperCase() === "MEDIUM"
                 ? "bg-yellow-100 text-yellow-800"
                 : "bg-green-100 text-green-800"
           }`}
         >
-          {requirement.priority}
+          {requirement.priority?.toUpperCase()}
         </span>
       </td>
       <td className="px-4 py-3">
         <span
           className={`px-2 py-1 text-xs font-semibold rounded ${
-            requirement.status === "NEW"
+            requirement.status=== "NEW"
               ? "bg-yellow-100 text-yellow-800"
               : requirement.status === "DISCUSSION"
                 ? "bg-blue-100 text-blue-800"
-                : requirement.status === "IN_PROGRESS"
+                : requirement.status === "ACCEPTED"
                   ? "bg-indigo-100 text-indigo-800"
                   : requirement.status === "COMPLETED"
                     ? "bg-green-100 text-green-800"
@@ -39,7 +39,7 @@ export function RequirementCard({ requirement }: {requirement: RequirementDispla
       </td>
       <td className="px-4 py-3">
         <Link
-          href={`/solveIT/${requirement.id}`}
+          href={`/solveIt/${requirement.id}`}
           className="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 inline-block"
         >
           View Details

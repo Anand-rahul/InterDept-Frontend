@@ -1,29 +1,5 @@
-import { SolutionDetails, UseCase } from "@/models/solution"
 import { jwtAuth } from "@/utils/jwtAuth";
 import { NextRequest, NextResponse } from "next/server";
-
-const useCases:UseCase[] = [
-  {
-    id :1,
-    title: "AWS Cost Optimization",
-    description:
-      "Identifies and eliminates unused AWS resources and rightsizes EC2 instances based on usage patterns.",
-    fileId: "7",
-  },
-  {
-    id:2,
-    title: "Multi-Cloud Resource Management",
-    description:
-      "Provides unified view and management of resources across AWS, Azure, and Google Cloud to prevent redundancy.",
-      fileId: "7",
-  },
-  {
-    id:3,
-    title: "Automated Scaling Policies",
-    description: "Implements intelligent scaling policies based on historical usage patterns and business hours.",
-    fileId: "7",
-  },
-]
 
 export async function GET(
   request: NextRequest,
@@ -31,7 +7,7 @@ export async function GET(
 ): Promise<NextResponse> {
   try {
     const id = (await params).id
-    const url = `http://localhost:8080/api/solution/${id}`
+    const url = `http://localhost:8080/api/requirement/${id}/file`
 
     // Make the API request with the bearer token from the incoming request
     const response = await fetch(url, {
@@ -51,13 +27,12 @@ export async function GET(
     }
 
     // Parse the response data
-    const data: SolutionDetails = await response.json();
-    data.useCases = useCases;
+    const data = await response.json();
 
-    // Return successful response with the solutions data
+    // Return successful response with the File data
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
-    console.error("Error fetching solutions:", error);
+    console.error("Error fetching files:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -14,7 +14,7 @@ export function MainPageButtons() {
         Browse Solutions
       </button>
       <button
-        onClick={() => router.push("/solveIT/submit")}
+        onClick={() => router.push("/solveIt/submit")}
         className="bg-yellow-500 text-white px-5 py-3 rounded font-medium transition-all duration-200 hover:bg-yellow-600 hover:scale-105"
       >
         SolveIt Now

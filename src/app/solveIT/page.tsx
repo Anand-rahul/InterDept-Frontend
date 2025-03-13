@@ -1,15 +1,105 @@
 "use client";
 
+import { LoadingSpinner } from "@/components/loadingSpinner";
 import { RequirementCard } from "@/components/requirementCard";
-import { requirements } from "@/staticData/solutionData";
-import { useState } from "react";
+import { RequirementDisplay } from "@/models/requirement";
+import { Loader2 } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
-type TabType = "solution-requests" | "my-requests"
-const allRequirements = requirements;
-const myRequirements = requirements;
+type TabType = "solution-requests" | "my-requests";
 
 export default function SolveItPage() {
-  const [activeTab, setActiveTab] = useState<TabType>("solution-requests")
+  const [activeTab, setActiveTab] = useState<TabType>("solution-requests");
+  const [allRequirements, setAllRequirements] = useState<RequirementDisplay[]>(
+    []
+  );
+  const [myRequirements, setMyRequirements] = useState<RequirementDisplay[]>(
+    []
+  );
+  const [isLoading, setIsLoading] = useState({
+    all: true,
+    my: true,
+  });
+  const [error, setError] = useState({
+    all: false,
+    my: false,
+  });
+
+  useEffect(() => {
+    async function fetchAllRequirements() {
+      try {
+        const response = await fetch("/api/solveIt?section=all");
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch all requirements");
+        }
+
+        const data = await response.json();
+        setAllRequirements(data);
+      } catch (err) {
+        setError((prev) => ({ ...prev, all: true }));
+        console.error("Error fetching All requirements:", err);
+      } finally {
+        setIsLoading((prev) => ({ ...prev, all: false }));
+      }
+    }
+
+    async function fetchMyRequirements() {
+      try {
+        const response = await fetch("/api/solveIt?section=my");
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch my requirements");
+        }
+
+        const data = await response.json();
+        setMyRequirements(data);
+      } catch (err) {
+        setError((prev) => ({ ...prev, my: true }));
+        console.error("Error fetching my requirements:", err);
+      } finally {
+        setIsLoading((prev) => ({ ...prev, my: false }));
+      }
+    }
+
+    fetchAllRequirements();
+    fetchMyRequirements();
+  }, []);
+
+  // Helper function to render loading or error state
+  const renderRowsOrError = (
+    type: "all" | "my",
+    requirements: RequirementDisplay[]
+  ) => {
+    return isLoading[type] ? (
+      <tr>
+        <td colSpan={6}>
+          <LoadingSpinner />
+        </td>
+      </tr>
+    ) : error[type] ? (
+      <tr>
+        <td colSpan={6}>
+          <div className="text-red-500 p-4 text-center">
+            Failed to load. Please try again later.
+          </div>
+        </td>
+      </tr>
+    ) : requirements.length === 0 ? (
+      <tr>
+        <td colSpan={6}>
+          <div className="text-gray-500 p-4 text-center">
+            No requirements found
+          </div>
+        </td>
+      </tr>
+    ) : (
+      requirements.map((requirement) => (
+        <RequirementCard key={requirement.id} requirement={requirement} />
+      ))
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[#f8f9fa]">
@@ -18,6 +108,14 @@ export default function SolveItPage() {
         <h1 className="text-2xl font-semibold mb-1">
           SolveIT - Review & Accept Solution Requests
         </h1>
+        {/* <div className="mt-4 space-x-4">
+          <Link
+            href={`submit`}
+            className="bg-yellow-500 text-white px-5 py-3 rounded font-medium transition-all duration-200 hover:bg-yellow-600 hover:scale-105"
+          >
+            SolveIt Now
+          </Link>
+        </div> */}
       </div>
 
       <div className="container mx-auto px-4 py-3">
@@ -60,19 +158,9 @@ export default function SolveItPage() {
                 </tr>
               </thead>
               <tbody>
-              {activeTab === "solution-requests"
-                  ? allRequirements.map((requirement) => (
-                      <RequirementCard
-                        key={requirement.id}
-                        requirement={requirement}
-                      />
-                    ))
-                  : myRequirements.map((requirement) => (
-                  <RequirementCard
-                    requirement={requirement}
-                    key={requirement.id}
-                  />
-                ))}
+                {activeTab === "solution-requests"
+                  ? renderRowsOrError("all", allRequirements)
+                  : renderRowsOrError("my", myRequirements)}
               </tbody>
             </table>
           </div>
@@ -80,8 +168,13 @@ export default function SolveItPage() {
           {/* Empty state for My Requests if needed */}
           {activeTab === "my-requests" && myRequirements.length === 0 && (
             <div className="text-center py-8">
-              <p className="text-gray-500">You haven`&apos;`t submitted any requests yet.</p>
-              <a href="/submit-requirement" className="text-blue-600 hover:underline mt-2 inline-block">
+              <p className="text-gray-500">
+                You haven &apos;t submitted any requests yet.
+              </p>
+              <a
+                href="/submit"
+                className="text-blue-600 hover:underline mt-2 inline-block"
+              >
                 Submit a new requirement
               </a>
             </div>

@@ -27,10 +27,6 @@ export default function RequirementDetailsPage() {
   console.log(requirement);
 
   useEffect(() => {
-    setRequirement(requirement);
-  }, [requirement]);
-
-  useEffect(() => {
     async function fetchRequirementDetails() {
       try {
         setIsLoading(true);
@@ -96,7 +92,7 @@ export default function RequirementDetailsPage() {
   async function updateAssigned(email: string) {
     try {
       const body = {user: email}
-      const response = await fetch(`/api/solveIt/${id}/status?value=accepted`,{method: "PUT", body: JSON.stringify(body)} );
+      const response = await fetch(`/api/solveIt/${id}/status?value=ACCEPTED`,{method: "PUT", body: JSON.stringify(body)} );
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -107,6 +103,7 @@ export default function RequirementDetailsPage() {
 
       const data = await response.json();
       requirement!.status = "ACCEPTED"
+      // setRequirement(requirement);
     } catch (err) {
       console.error("Error updating requirement details:", err);
     }
@@ -140,10 +137,10 @@ export default function RequirementDetailsPage() {
   };
 
   //TODO: get users from backend
-  const handleConfirmAssignment = async () => {
+  const handleConfirmAssignment = () => {
     if (selectedEngineer) {
-      // alert(`Requirement assigned to ${selectedEngineer}`);
-      await updateAssigned(selectedEngineer);
+      alert(`Requirement assigned to ${selectedEngineer}`);
+      updateAssigned(selectedEngineer);
       setShowAssignPanel(false);
     } else {
       alert("Please select an engineer to assign");
@@ -181,14 +178,14 @@ export default function RequirementDetailsPage() {
             <span className="mx-2">•</span>
             <span
               className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                requirement.priority?.toUpperCase() === "HIGH"
+                requirement.priority === "High"
                   ? "bg-red-100 text-red-800"
-                  : requirement.priority?.toUpperCase() === "MEDIUM"
+                  : requirement.priority === "Medium"
                   ? "bg-yellow-100 text-yellow-800"
                   : "bg-green-100 text-green-800"
               }`}
             >
-              {requirement.priority?.toUpperCase()} Priority
+              {requirement.priority} Priority
             </span>
           </div>
           <div className="text-sm text-gray-600 flex items-center">

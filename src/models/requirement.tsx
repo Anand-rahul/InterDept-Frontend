@@ -7,9 +7,9 @@ export type RequirementDisplay = {
     lineOfBusiness: string;
     productName: string;
     priority: "Low" | "Medium" | "High";
-    status:"NEW" | "DISCUSSION" | "APPROVED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+    status:"NEW" | "DISCUSSION" | "APPROVED" | "ACCEPTED" | "COMPLETED" | "CANCELLED";
     createdDate: string; // ISO date string
-    createdBy: string; // ISO date string
+    createdBy: string; 
   };
   
  export type RequirementDetails = {
@@ -21,9 +21,9 @@ export type RequirementDisplay = {
     lineOfBusiness: string;
     productName: string;
     priority: "Low" | "Medium" | "High";
-    status: "NEW" | "DISCUSSION" | "APPROVED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+    status: "NEW" | "DISCUSSION" | "APPROVED" | "ACCEPTED" | "COMPLETED" | "CANCELLED";
     createdDate: string; // ISO date string
-    solution: number | null;
+    solutionId: number | null;
     problemStatement: string;
     expectedImpact: string;
     userStory: string | null;
