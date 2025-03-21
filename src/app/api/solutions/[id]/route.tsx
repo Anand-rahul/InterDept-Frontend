@@ -1,29 +1,29 @@
-import { SolutionDetails, UseCase } from "@/models/solution"
+import { SolutionDetails } from "@/models/solution"
 import { jwtAuth } from "@/utils/jwtAuth";
 import { NextRequest, NextResponse } from "next/server";
 
-const useCases:UseCase[] = [
-  {
-    id :1,
-    title: "AWS Cost Optimization",
-    description:
-      "Identifies and eliminates unused AWS resources and rightsizes EC2 instances based on usage patterns.",
-    fileId: "7",
-  },
-  {
-    id:2,
-    title: "Multi-Cloud Resource Management",
-    description:
-      "Provides unified view and management of resources across AWS, Azure, and Google Cloud to prevent redundancy.",
-      fileId: "7",
-  },
-  {
-    id:3,
-    title: "Automated Scaling Policies",
-    description: "Implements intelligent scaling policies based on historical usage patterns and business hours.",
-    fileId: "7",
-  },
-]
+// const useCases:UseCase[] = [
+//   {
+//     id :1,
+//     title: "AWS Cost Optimization",
+//     description:
+//       "Identifies and eliminates unused AWS resources and rightsizes EC2 instances based on usage patterns.",
+//     documentId: "7",
+//   },
+//   {
+//     id:2,
+//     title: "Multi-Cloud Resource Management",
+//     description:
+//       "Provides unified view and management of resources across AWS, Azure, and Google Cloud to prevent redundancy.",
+//       documentId: "7",
+//   },
+//   {
+//     id:3,
+//     title: "Automated Scaling Policies",
+//     description: "Implements intelligent scaling policies based on historical usage patterns and business hours.",
+//     documentId: "7",
+//   },
+// ]
 
 export async function GET(
   request: NextRequest,
@@ -52,7 +52,7 @@ export async function GET(
 
     // Parse the response data
     const data: SolutionDetails = await response.json();
-    data.useCases = useCases;
+    // data.useCases = useCases;
 
     // Return successful response with the solutions data
     return NextResponse.json(data, { status: 200 });

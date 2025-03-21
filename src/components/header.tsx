@@ -1,12 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { getUserData } from "@/components/userData";
-import { UserMenu } from "./userMenu";import 
-{ usePathname, useRouter } from "next/navigation"
-import { User, LogOut, ChevronDown, Settings, FileText, PlusCircle, ListChecks } from "lucide-react"
-
+import { UserMenu } from "./userMenu";
+import { usePathname } from "next/navigation";
 
 const navItems = [
   { name: "Home", href: "/" },
@@ -18,31 +15,12 @@ const navItems = [
 
 export function Header() {
   const pathname = usePathname();
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const userMenuRef = useRef<HTMLDivElement>(null);
-
   const userData = getUserData();
-  // Close the menu when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        userMenuRef.current &&
-        !userMenuRef.current.contains(event.target as Node)
-      ) {
-        setIsUserMenuOpen(false);
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   const handleLogout = () => {
     // In a real app, this would handle the logout process
     console.log("Logging out...");
-    setIsUserMenuOpen(false);
+    // setIsUserMenuOpen(false);
     // You would typically redirect to login page or clear auth state here
   };
 

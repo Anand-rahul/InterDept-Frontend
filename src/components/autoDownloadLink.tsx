@@ -1,7 +1,7 @@
 // components/AutoDownloadLink.tsx
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 interface AutoDownloadLinkProps {
   fileId: string;
@@ -30,7 +30,7 @@ export default function AutoDownloadLink({
       setTimeout(() => {
         try {
           newTab.close();
-        } catch (error) {
+        } catch {
           console.log("Could not automatically close tab due to browser security restrictions");
         }
       }, 1000);

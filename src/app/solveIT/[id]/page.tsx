@@ -105,7 +105,7 @@ export default function RequirementDetailsPage() {
         throw new Error("Failed to update requirement");
       }
 
-      const data = await response.json();
+      // const data = await response.json();
       requirement!.status = "ACCEPTED"
     } catch (err) {
       console.error("Error updating requirement details:", err);

@@ -1,5 +1,4 @@
 import { jwtAuth } from "@/utils/jwtAuth";
-import { log } from "console";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
@@ -47,7 +46,7 @@ export async function POST(
     }
     const data = await response.json();
     let assistantResponse = "";
-    let conversationGuid = data.guid || "";
+    const conversationGuid = data.guid || "";
     
     if (data.content && Array.isArray(data.content)) {
       // Find the last assistant entry in the content array

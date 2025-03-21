@@ -2,6 +2,7 @@ import { ChevronDown, LogOut, Settings, User } from "lucide-react";
 import { UserData } from "@/components/userData";
 import { useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 // Get user initials for avatar
 const getInitials = (name: string) => {
@@ -29,8 +30,20 @@ export function UserMenu({
 
   const userInitials = getInitials(name);
 
-  const DEFAULT_AVATAR = "https://ui-avatars.com/api?background=0D8ABC&color=fff";
+  const DEFAULT_AVATAR =
+    "https://ui-avatars.com/api?background=0D8ABC&color=fff";
   avatarUrl = avatarUrl || `${DEFAULT_AVATAR}&name=${userInitials}`;
+
+  const profileImage = (
+    <Image
+      loader={() => avatarUrl}
+      src={avatarUrl}
+      alt={name}
+      className="w-full h-full object-cover"
+      width={32}
+      height={32}
+    />
+  );
 
   return (
     <div className="relative" ref={userMenuRef}>
@@ -41,11 +54,7 @@ export function UserMenu({
         aria-haspopup="true"
       >
         <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
-          <img
-            src={avatarUrl || DEFAULT_AVATAR}
-            alt={name}
-            className="w-full h-full object-cover"
-          />
+          {profileImage}
         </div>
         <ChevronDown className="h-4 w-4 text-gray-500" />
       </button>
@@ -56,11 +65,7 @@ export function UserMenu({
           <div className="px-4 py-3 border-b border-gray-100">
             <div className="flex items-center mb-2">
               <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden mr-3">
-                <img
-                  src={avatarUrl || DEFAULT_AVATAR}
-                  alt={name}
-                  className="w-full h-full object-cover"
-                />
+                {profileImage}
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-800">{name}</p>

@@ -1,26 +1,8 @@
 import { SolutionDisplay, statusColors } from "@/models/solution";
 import { Eye, ThumbsUp } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
 
 export function SolutionCard({ solution }: { solution: SolutionDisplay }) {
-  const [isLiked, setIsLiked] = useState(solution.isLiked);
-  const [likeCount, setLikeCount] = useState(solution.likeCount);
-
-  const handleLikeClick = (e: React.MouseEvent) => {
-    // Prevent the click from navigating to the solution details page
-    e.preventDefault();
-    e.stopPropagation();
-
-    // Toggle like state
-    if (isLiked) {
-      setLikeCount((prev) => prev - 1);
-    } else {
-      setLikeCount((prev) => prev + 1);
-    }
-    setIsLiked(!isLiked);
-  };
-  
   return (
     <Link href={`/solutions/${solution.id}`} className="block h-full">
       <div className="card flex flex-col h-full">

@@ -4,7 +4,6 @@ import type React from "react";
 
 import { useState, useRef, useEffect } from "react";
 import {
-  MessageCircle,
   X,
   Send,
   HelpCircle,
@@ -34,7 +33,6 @@ interface ChatResponse {
   guid?: string;
 }
 
-const title = "Chat to know more";
 export function ChatBubble({
   title = "Chat to know more",
   faqs = [],

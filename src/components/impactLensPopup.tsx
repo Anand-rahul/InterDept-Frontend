@@ -34,7 +34,7 @@ interface EditModalProps {
   
           <div className="mb-4">
             <p className="text-sm font-medium text-gray-700 mb-1">Solution</p>
-            <p className="text-sm text-gray-600">{useCase.solution}</p>
+            <p className="text-sm text-gray-600">{useCase.solutionTitle}</p>
           </div>
 
           <div className="mb-4">

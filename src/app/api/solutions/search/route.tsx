@@ -34,20 +34,10 @@ export async function GET(request: NextRequest) {
     }
 
     
-    const data = await response.json();
-    console.log(data)
+    // const data = await response.json();
+    const processedData: SolutionDisplay[] = await response.json();
+    console.log(processedData)
     // Process the data - convert date strings to Date objects
-    const processedData: SolutionDisplay[] = data.map((item: SolutionDisplay) => ({
-      id: item.id,
-      title: item.title,
-      description: item.description,
-      department: item.department,
-      likeCount: item.likeCount,
-      viewCount: item.viewCount,
-      isLiked: item.isLiked,
-      createdDate: item.createdDate,
-      updatedDate: item.updatedDate
-    }));
 
     return NextResponse.json(processedData);
   } catch (error) {

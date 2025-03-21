@@ -7,6 +7,38 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { FileText, X, Upload, Download } from "lucide-react";
 import AutoDownloadLink from "@/components/autoDownloadLink";
 
+const solutionNames: string[] = [
+  "AI-Powered Customer Support Chatbot",
+  "Cybersecurity Threat Detection System",
+  "Enterprise Data Technology Platform (EDTP)",
+  "Intelligent Document Processing System",
+  "DNC Partner Mobile Response Portal DB to Data Lake",
+  "Predictive Maintenance System",
+  "Rapid Lead Response (Rapid LR)",
+  "Empanelment Table Column Addition Data Lake",
+  "Background Verification Data Migration to Data Lake",
+  "MCO - BL - Communication Priority Logic in PLPOS",
+  "NetCore Email Communication Data Migration SFTP to Data Lake",
+  "KARIX WHATSAPP PROMO Data Lake Migration",
+  "Partner Feedback Data Lake Migration",
+  "SME CW SFDC Lead Allocation",
+  "DNC Partner Batch Master Migration to Data Lake",
+  "WHEELS Tractor Financing SFDC Lead Allocation API",
+  "RMS DLOnboard Order & Payment Details Migration",
+  "Miles Data Migration to Data Lake",
+  "NDCSubmissionSummaryTrail Data Migration",
+  "AI-Powered Re-Engagement Platform",
+  "Real-Time Promotional Calling System",
+  "SME ProfLoan SFDC Lead Allocation",
+  "Photo Match & OVD Document Validation",
+  "Cloud Migration Project",
+  "IT Asset Management System",
+  "Settlement High Pos Validation Migration",
+  "Payments Acquiring Integration with PL@POS",
+  "PartnerOne Historical Data Migration",
+  "RMS DLOnboard Customer Subscription Mapping",
+];
+
 function SubmitRequirement() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -199,7 +231,7 @@ function SubmitRequirement() {
                   onChange={handleInputChange}
                   className="w-full p-2 text-sm border rounded"
                 >
-                  <option>IT</option>
+                  <option>Business</option>
                   <option>Operations</option>
                   <option>Sales</option>
                   <option>Marketing</option>
@@ -213,6 +245,7 @@ function SubmitRequirement() {
                   onChange={handleInputChange}
                   className="w-full p-2 text-sm border rounded"
                 >
+                  <option>COE</option>
                   <option>Data Analytics</option>
                   <option>Cloud Infrastructure</option>
                   <option>Customer Support</option>
@@ -310,11 +343,11 @@ function SubmitRequirement() {
                 disabled={isSolutionPassed}
               >
                 <option value="">Select a solution</option>
-                <option>Loan Processing AI</option>
-                <option>Chatbot Customer Support</option>
-                <option>Cloud Cost Optimizer</option>
-                <option>Customer Retargeting System</option>
-                <option>Inventory Management System</option>
+                {solutionNames.map((solution, index) => (
+                  <option key={index} id={solution}>
+                    {solution}
+                  </option>
+                ))}
               </select>
             </div>
           )}
@@ -327,9 +360,9 @@ function SubmitRequirement() {
                 <AutoDownloadLink
                   fileId={getRequirementsDocUrl()}
                   className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
-                  >
-                    <Download size={14} className="mr-1" />
-                    Download pre-requisite document
+                >
+                  <Download size={14} className="mr-1" />
+                  Download pre-requisite document
                 </AutoDownloadLink>
               </div>
             )}

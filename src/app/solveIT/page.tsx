@@ -3,8 +3,6 @@
 import { LoadingSpinner } from "@/components/loadingSpinner";
 import { RequirementCard } from "@/components/requirementCard";
 import { RequirementDisplay } from "@/models/requirement";
-import { Loader2 } from "lucide-react";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 type TabType = "solution-requests" | "my-requests";
@@ -172,7 +170,7 @@ export default function SolveItPage() {
                 You haven &apos;t submitted any requests yet.
               </p>
               <a
-                href="/submit"
+                href="/solveIt/submit"
                 className="text-blue-600 hover:underline mt-2 inline-block"
               >
                 Submit a new requirement

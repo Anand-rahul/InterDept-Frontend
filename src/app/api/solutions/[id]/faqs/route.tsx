@@ -1,4 +1,4 @@
-import { FAQ } from "@/components/faqItem";
+import { FAQ } from "@/models/solution";
 import { jwtAuth } from "@/utils/jwtAuth";
 import { NextRequest, NextResponse } from "next/server";
 

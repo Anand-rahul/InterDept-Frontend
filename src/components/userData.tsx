@@ -16,20 +16,21 @@ const userData: UserData = {
 };
 
 
-import {jwtDecode} from "jwt-decode";
-import { jwtAuth } from "@/utils/jwtAuth";
+// import {jwtDecode, JwtPayload} from "jwt-decode";
+// import { jwtAuth } from "@/utils/jwtAuth";
 
 export const getUserData = (): UserData => {
-  const token = jwtAuth;
-  if (token) {
-    const decoded: any = jwtDecode(token); // Decode token
-    console.log(decoded);
-    return {
-      name: decoded.name || userData.name,
-      email: decoded.email || userData.email,
-      role: decoded.role || userData.role,
-      avatarUrl: decoded.avatarUrl || userData.avatarUrl,
-    };
-  }
+  // const token = jwtAuth;
+  //TODO: Maybe implment this
+  // if (token) {
+  //   const decoded: JwtPayload = jwtDecode(token); // Decode token
+  //   console.log(decoded);
+  //   return {
+  //     name: decoded.name || userData.name,
+  //     email: decoded.email || userData.email,
+  //     role: decoded.role || userData.role,
+  //     avatarUrl: decoded.avatarUrl || userData.avatarUrl,
+  //   };
+  // }
   return userData;
 };

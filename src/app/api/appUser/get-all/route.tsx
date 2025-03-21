@@ -1,11 +1,9 @@
 import { jwtAuth } from "@/utils/jwtAuth";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(
-  request: NextRequest
-): Promise<NextResponse> {
+export async function GET(): Promise<NextResponse> {
   try {
-    const url = `http://localhost:8080/api/user/get-all`
+    const url = `http://localhost:8080/api/user/get-all`;
 
     // Make the API request with the bearer token from the incoming request
     const response = await fetch(url, {

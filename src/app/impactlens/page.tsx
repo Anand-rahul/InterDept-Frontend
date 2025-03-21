@@ -3,7 +3,7 @@
 import type React from "react";
 
 import { useEffect, useState } from "react";
-import { ExternalLink, Filter, Search, Edit, X } from "lucide-react";
+import { ExternalLink, Filter, Search, Edit } from "lucide-react";
 import Link from "next/link";
 import { UseCase } from "@/models/solution";
 import { EditModal } from "@/components/impactLensPopup";
@@ -97,7 +97,7 @@ export default function ImpactLensPage() {
     async function fetchUseCases() {
       try {
         setIsLoading(true);
-        const response = await fetch("/api/impactLens");
+        const response = await fetch("/api/impactlens");
 
         if (!response.ok) {
           throw new Error("Failed to fetch all use cases");
@@ -113,34 +113,34 @@ export default function ImpactLensPage() {
       }
     }
 
-    // fetchUseCases();
+    fetchUseCases();
     setUseCases(solutionsData);
   }, []);
 
-  async function updateUseCase(
-    id: number,
-    dashboardUrl: string,
-    comments: string
-  ) {
-    try {
-      const body = { comments, dashboardUrl };
-      const response = await fetch(`/api/impactlens/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(body),
-      });
+  // async function updateUseCase(
+  //   id: number,
+  //   dashboardUrl: string,
+  //   comments: string
+  // ) {
+  //   try {
+  //     const body = { id, comments, dashboardUrl };
+  //     const response = await fetch(`/api/impactlens/${id}`, {
+  //       method: "PUT",
+  //       body: JSON.stringify(body),
+  //     });
 
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error("UseCase not updated");
-        }
-        throw new Error("Failed to update UseCase");
-      }
+  //     if (!response.ok) {
+  //       if (response.status === 404) {
+  //         throw new Error("UseCase not updated");
+  //       }
+  //       throw new Error("Failed to update UseCase");
+  //     }
 
-      const data = await response.json();
-    } catch (err) {
-      console.error("Error updating requirement details:", err);
-    }
-  }
+  //     const data = await response.json();
+  //   } catch (err) {
+  //     console.error("Error updating requirement details:", err);
+  //   }
+  // }
 
   // Filter solutions based on search term and selected department
   const filteredSolutions = useCases.filter((uc) => {
@@ -175,38 +175,6 @@ export default function ImpactLensPage() {
       useCases.map((uc) =>
         uc.id === id ? { ...uc, dashboardUrl, comments } : uc
       )
-    );
-  };
-
-  // Helper function to render loading or error state
-  const renderRowsOrError = (
-    children: React.ReactNode,
-    useCases: UseCase[]
-  ) => {
-    return isLoading ? (
-      <tr>
-        <td colSpan={6}>
-          <LoadingSpinner />
-        </td>
-      </tr>
-    ) : error ? (
-      <tr>
-        <td colSpan={6}>
-          <div className="text-red-500 p-4 text-center">
-            Failed to load. Please try again later.
-          </div>
-        </td>
-      </tr>
-    ) : useCases.length === 0 ? (
-      <tr>
-        <td colSpan={6}>
-          <div className="text-gray-500 p-4 text-center">
-            No Use Cases found
-          </div>
-        </td>
-      </tr>
-    ) : (
-      { children }
     );
   };
 
@@ -278,7 +246,7 @@ export default function ImpactLensPage() {
                     Use Case
                   </th>
                   <th className="px-4 py-3 text-left font-medium text-gray-600">
-                    Reporting
+                    Business Report
                   </th>
                   <th className="px-4 py-3 text-left font-medium text-gray-600">
                     Comments

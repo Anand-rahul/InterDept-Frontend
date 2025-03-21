@@ -3,23 +3,24 @@
 import type React from "react"
 import { useState } from "react"
 
-export interface ComparedSolution {
+interface SimilarSolution {
+  id: number
   name: string
-  id: string
   similarity: number
-  status: "duplicate" | "redundant" | "optimize"
 }
 
-export interface DuplicateSolution {
+export interface Solution {
   id: number
   name: string
   owner: string
-  comparedSolutions: ComparedSolution[]
+  similarSolutions: SimilarSolution[]
   status: "pending" | "approved" | "rejected"
+  action: "no_change" | "decommission" | "merge_into"
+  mergeTarget?: number
 }
 
 interface DuplicateSolutionItemProps {
-  solution: DuplicateSolution
+  solution: Solution
   onApprove: (id: number, decision: string) => void
 }
 
@@ -68,7 +69,7 @@ export function OptimaxItem({ solution, onApprove }: DuplicateSolutionItemProps)
         <td className="px-4 py-3">{solution.owner}</td>
         <td className="px-4 py-3">
           <button onClick={toggleComparison} className="text-blue-600 underline text-sm cursor-pointer">
-            Compared to {solution.comparedSolutions.length} solutions
+            Compared to {solution.similarSolutions.length} solutions
           </button>
         </td>
         <td className="px-4 py-3">
@@ -107,10 +108,9 @@ export function OptimaxItem({ solution, onApprove }: DuplicateSolutionItemProps)
             <div className="p-3 border border-gray-200 rounded-lg bg-gray-50 mb-3">
               <h3 className="text-sm font-semibold mb-2">🆚 Compared Solutions</h3>
               <ul className="space-y-2">
-                {solution.comparedSolutions.map((compared, index) => (
+                {solution.similarSolutions.map((compared, index) => (
                   <li key={index} className="text-sm">
                     <strong>{compared.name}</strong> (ID: {compared.id}) - Similarity: {compared.similarity}% -{" "}
-                    <span className={getStatusColor(compared.status)}>{getStatusText(compared.status)}</span>
                   </li>
                 ))}
               </ul>

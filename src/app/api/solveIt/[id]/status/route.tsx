@@ -1,4 +1,3 @@
-import { PageResponse } from "@/models/pageResponse";
 import { RequirementDisplay } from "@/models/requirement";
 import { jwtAuth } from "@/utils/jwtAuth";
 import { NextRequest, NextResponse } from "next/server";

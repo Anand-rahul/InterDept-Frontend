@@ -159,16 +159,26 @@ export default function SolutionDetailsPage() {
               </div>
               <div className="flex items-center text-gray-600">
                 <Users size={16} className="mr-1 text-blue-600" />
-                <span>Delivery Manager: {solution.deliveryManager}</span>
+                <span>Delivery Head: {solution.deliveryManager}</span>
               </div>
             </div>
 
             {/* Right-aligned metrics */}
             <div className="flex flex-wrap gap-4 text-sm items-center">
-              <div className="flex items-center text-gray-600">
-                <ThumbsUp size={16} className="mr-1 text-blue-600" />
-                <span>{solution.likeCount} Likes</span>
-              </div>
+              <button
+                onClick={handleLikeClick}
+                className={`flex items-center text-gray-600 hover:text-blue-600 transition-colors ${
+                  likeCount ? "text-blue-600 font-medium" : ""
+                }`}
+              >
+                <ThumbsUp
+                  size={16}
+                  className={`mr-1 ${
+                    isLiked ? "fill-current text-blue-600" : "text-gray-500"
+                  }`}
+                />
+                <span>{likeCount} Likes</span>
+              </button>
               <div className="flex items-center text-gray-600">
                 <Eye size={16} className="mr-1 text-blue-600" />
                 <span>{solution.viewCount} Views</span>
@@ -212,11 +222,7 @@ export default function SolutionDetailsPage() {
           <ul className="space-y-2">
             {isDocumentsLoading ? (
               <LoadingSpinner size="small" />
-            ) : documents.length === 0 ? (
-              <p className="text-sm text-gray-500 italic">
-                No documents available for this solution.
-              </p>
-            ) : (
+            ) : documents && documents.length > 0 ? (
               Object.entries(documents).map(([fileName, value], index) => (
                 <li key={index} className="flex items-center">
                   <FileText className="h-5  w-5 text-blue-500 mr-2" />
@@ -228,6 +234,10 @@ export default function SolutionDetailsPage() {
                   </AutoDownloadLink>
                 </li>
               ))
+            ) : (
+              <p className="text-sm text-gray-500 italic">
+                No documents available for this solution.
+              </p>
             )}
           </ul>
         </div>
@@ -248,7 +258,7 @@ export default function SolutionDetailsPage() {
                         {useCase.title}
                       </h3>
                       <AutoDownloadLink
-                        fileId={useCase.fileId}
+                        fileId={useCase.documentId}
                         className="text-blue-600 hover:text-blue-800 text-xs flex items-center"
                       >
                         <FileDown size={14} className="mr-1" />

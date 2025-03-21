@@ -4,17 +4,17 @@ import { LoadingSpinner } from "@/components/loadingSpinner";
 import { SearchBar } from "@/components/searchBar";
 import { SolutionCard } from "@/components/solutionCard";
 import { SolutionDisplay } from "@/models/solution";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-export default function SolutionsPage() {
+function Solutions() {
   const [solutions, setSolutions] = useState<SolutionDisplay[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
   
   // Handle search results from the SearchBar component
-  const handleSearchResults = (results: any[]) => {
+  const handleSearchResults = (results: SolutionDisplay[]) => {
     // Process the data to ensure dates are Date objects
     const processedResults = results.map(item => ({
       ...item,
@@ -47,7 +47,7 @@ export default function SolutionsPage() {
         throw new Error("Failed to fetch solutions");
       }
 
-      const data: any[] = await response.json();
+      const data: SolutionDisplay[] = await response.json();
       
       // Convert date strings to Date objects
       const processedData = data.map(solution => ({
@@ -97,5 +97,13 @@ export default function SolutionsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function SolutionsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Solutions />
+    </Suspense>
   );
 }

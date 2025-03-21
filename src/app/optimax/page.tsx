@@ -1,70 +1,178 @@
 "use client";
 
 import { useState } from "react";
-import { type DuplicateSolution } from "@/components/optimaxItem";
 import { AlertCircle, BarChart3, CheckCircle } from "lucide-react";
-import { OptimaxTable } from "@/components/optimaxTable";
+import { type Solution, OptimaxTable } from "@/components/optimaxTable";
+import MergeSelectionModal from "@/components/mergeSelectionModal";
+
+// Initial solutions data
+const initialSolutions: Solution[] = [
+  {
+    id: 1,
+    name: "AI Loan Processing",
+    owner: "John Doe (IT Team)",
+    status: "pending",
+    action: "no_change",
+    similarSolutions: [
+      { id: 2, name: "Loan AI Assistant", similarity: 88 },
+      { id: 3, name: "Smart Loan Processing", similarity: 75 },
+      { id: 4, name: "Fast Loan Validator", similarity: 72 },
+    ],
+  },
+  {
+    id: 2,
+    name: "Loan AI Assistant",
+    owner: "Sarah Johnson (Retail Banking)",
+    status: "pending",
+    action: "no_change",
+    similarSolutions: [
+      { id: 1, name: "AI Loan Processing", similarity: 88 },
+      { id: 3, name: "Smart Loan Processing", similarity: 70 },
+    ],
+  },
+  {
+    id: 3,
+    name: "Smart Loan Processing",
+    owner: "Michael Chen (Loan Dept)",
+    status: "pending",
+    action: "no_change",
+    similarSolutions: [
+      { id: 1, name: "AI Loan Processing", similarity: 75 },
+      { id: 2, name: "Loan AI Assistant", similarity: 70 },
+    ],
+  },
+  {
+    id: 4,
+    name: "Fast Loan Validator",
+    owner: "Emma Wilson (Risk Management)",
+    status: "pending",
+    action: "no_change",
+    similarSolutions: [{ id: 1, name: "AI Loan Processing", similarity: 72 }],
+  },
+  {
+    id: 5,
+    name: "Customer Data Analytics",
+    owner: "Jane Smith (Data Team)",
+    status: "pending",
+    action: "no_change",
+    similarSolutions: [
+      { id: 6, name: "User Analytics Platform", similarity: 92 },
+      { id: 7, name: "Customer Insights Tool", similarity: 78 },
+    ],
+  },
+  {
+    id: 6,
+    name: "User Analytics Platform",
+    owner: "David Patel (Marketing)",
+    status: "pending",
+    action: "no_change",
+    similarSolutions: [
+      { id: 5, name: "Customer Data Analytics", similarity: 92 },
+      { id: 7, name: "Customer Insights Tool", similarity: 85 },
+    ],
+  },
+  {
+    id: 7,
+    name: "Customer Insights Tool",
+    owner: "Lisa Wong (Customer Experience)",
+    status: "pending",
+    action: "no_change",
+    similarSolutions: [
+      { id: 5, name: "Customer Data Analytics", similarity: 78 },
+      { id: 6, name: "User Analytics Platform", similarity: 85 },
+    ],
+  },
+  {
+    id: 8,
+    name: "Data Visualization Suite",
+    owner: "Robert Kim (Business Intelligence)",
+    status: "pending",
+    action: "no_change",
+    similarSolutions: [
+      { id: 7, name: "Customer Insights Tool", similarity: 65 },
+    ],
+  },
+];
 
 export default function OptiMaxPage() {
-  const [duplicateSolutions, setDuplicateSolutions] = useState<
-    DuplicateSolution[]
-  >([
-    {
-      id: 1,
-      name: "AI Loan Processing",
-      owner: "John Doe (IT Team)",
-      status: "pending",
-      comparedSolutions: [
-        {
-          name: "Loan AI Assistant",
-          id: "#123",
-          similarity: 88,
-          status: "duplicate",
-        },
-        {
-          name: "Smart Loan Processing",
-          id: "#456",
-          similarity: 75,
-          status: "redundant",
-        },
-        {
-          name: "Fast Loan Validator",
-          id: "#789",
-          similarity: 72,
-          status: "optimize",
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: "Customer Data Analytics",
-      owner: "Jane Smith (Data Team)",
-      status: "pending",
-      comparedSolutions: [
-        {
-          name: "User Analytics Platform",
-          id: "#234",
-          similarity: 92,
-          status: "duplicate",
-        },
-        {
-          name: "Customer Insights Tool",
-          id: "#567",
-          similarity: 78,
-          status: "redundant",
-        },
-      ],
-    },
-  ]);
+  const [solutions, setSolutions] = useState<Solution[]>(initialSolutions);
+  const [mergeModalOpen, setMergeModalOpen] = useState(false);
+  const [currentSolution, setCurrentSolution] = useState<Solution | null>(null);
 
-  const handleApprove = (id: number, decision: string) => {
-    setDuplicateSolutions((prev) =>
+  // Count total solutions and pending decisions
+  const totalSolutions = solutions.length;
+  const pendingDecisions = solutions.filter(
+    (s) => s.status === "pending"
+  ).length;
+
+  const handleActionChange = (
+    solutionId: number,
+    action: Solution["action"]
+  ) => {
+    setSolutions((prev) =>
       prev.map((solution) =>
-        solution.id === id ? { ...solution, status: "approved" } : solution
+        solution.id === solutionId
+          ? { ...solution, action, mergeTarget: undefined }
+          : solution
       )
     );
-    // In a real app, you would send this to your backend
-    console.log(`Solution ${id} approved with decision: ${decision}`);
+  };
+
+  const handleApprove = (solutionId: number) => {
+    const solution = solutions.find((s) => s.id === solutionId);
+    if (!solution) return;
+
+    if (solution.action === "no_change") {
+      // Just mark as approved
+      setSolutions((prev) =>
+        prev.map((s) =>
+          s.id === solutionId ? { ...s, status: "approved" } : s
+        )
+      );
+    } else if (solution.action === "decommission") {
+      // Mark as approved and remove from all similar solutions lists
+      setSolutions((prev) =>
+        prev.map((s) => {
+          if (s.id === solutionId) {
+            return { ...s, status: "approved" };
+          }
+
+          // Remove the decommissioned solution from similar solutions
+          return {
+            ...s,
+            similarSolutions: s.similarSolutions.filter(
+              (similar) => similar.id !== solutionId
+            ),
+          };
+        })
+      );
+    } else if (solution.action === "merge_into") {
+      // Open merge modal
+      setCurrentSolution(solution);
+      setMergeModalOpen(true);
+    }
+  };
+
+  const handleMergeConfirm = (solutionId: number, targetId: number) => {
+    // Close modal
+    setMergeModalOpen(false);
+
+    // Update solution status and remove from all similar solutions lists
+    setSolutions((prev) =>
+      prev.map((s) => {
+        if (s.id === solutionId) {
+          return { ...s, status: "approved", mergeTarget: targetId };
+        }
+
+        // Remove the merged solution from similar solutions
+        return {
+          ...s,
+          similarSolutions: s.similarSolutions.filter(
+            (similar) => similar.id !== solutionId
+          ),
+        };
+      })
+    );
   };
 
   return (
@@ -85,32 +193,28 @@ export default function OptiMaxPage() {
               <h2 className="text-lg font-medium text-gray-800">Dashboard</h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
                 <div className="text-sm text-gray-500 mb-1">
                   Total Solutions Analyzed
                 </div>
-                <div className="text-2xl font-semibold text-gray-800">150</div>
+                <div className="text-2xl font-semibold text-gray-800">
+                  150{/*totalSolutions*/}
+                </div>
               </div>
               <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
                 <div className="text-sm text-gray-500 mb-1">
                   Pending Decisions
                 </div>
-                <div className="text-2xl font-semibold text-amber-600">25</div>
-              </div>
-              <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-                <div className="text-sm text-gray-500 mb-1">
-                  Estimated Cost Savings
-                </div>
-                <div className="text-2xl font-semibold text-green-600">
-                ₹2,00,000
+                <div className="text-2xl font-semibold text-amber-600">
+                  25{/*pendingDecisions*/}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Identified Duplicates List */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+          {/* Solutions List */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-6">
             <div className="px-4 py-3 border-b border-gray-100">
               <div className="flex items-center">
                 <AlertCircle className="text-amber-500 mr-2" size={16} />
@@ -120,18 +224,23 @@ export default function OptiMaxPage() {
               </div>
             </div>
 
-            <OptimaxTable
-              solutions={duplicateSolutions}
-              onApprove={handleApprove}
-            />
+            <OptimaxTable solutions={solutions} onApprove={handleApprove} handleActionChange={handleActionChange} />
           </div>
         </div>
       </div>
 
       {/* Floating Confirm Actions Button */}
       <button className="fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm text-sm font-medium transition-colors duration-200 hover:bg-blue-700 flex items-center">
-        <CheckCircle size={16} className="mr-2" /> Confirm Actions
+        <CheckCircle size={16} className="mr-2" /> Confirm All Actions
       </button>
+
+      {/* Merge Selection Modal */}
+      <MergeSelectionModal
+        solution={currentSolution}
+        isOpen={mergeModalOpen}
+        onClose={() => setMergeModalOpen(false)}
+        onConfirm={handleMergeConfirm}
+      />
     </div>
   );
 }
